@@ -85,6 +85,18 @@
     .badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700}
     .badge.required{background:#fee2e2;color:#dc2626}
     .badge.optional{background:#e0f2fe;color:#0369a1}
+
+    /* Channel presets */
+    .channel-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px}
+    @media(max-width:500px){.channel-grid{grid-template-columns:1fr}}
+    .ch-btn{padding:9px 12px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:2px solid transparent;text-align:left;transition:all .15s;line-height:1.4}
+    .ch-btn .ch-env{font-size:10px;font-weight:700;letter-spacing:.06em;margin-bottom:2px}
+    .ch-btn .ch-name{font-size:12px}
+    .ch-btn.uat{border-color:#d4a017;background:#fffbeb;color:#92400e}
+    .ch-btn.uat:hover,.ch-btn.uat.active{background:#d4a017;color:#fff;border-color:#d4a017}
+    .ch-btn.prd{border-color:#059669;background:#f0fdf4;color:#065f46}
+    .ch-btn.prd:hover,.ch-btn.prd.active{background:#059669;color:#fff;border-color:#059669}
+    .ch-selected{font-size:11px;color:#6b7280;margin-top:6px;min-height:16px}
   </style>
 </head>
 <body>
@@ -113,11 +125,35 @@
     </div>
   </div>
 
+  <!-- Channel Preset -->
+  <div class="card">
+    <div class="card-title">2 · Channel Preset</div>
+    <div class="channel-grid">
+      <button class="ch-btn uat" id="ch-uat-cs" onclick="selectChannel('uat-cs')">
+        <div class="ch-env">UAT</div>
+        <div class="ch-name">Customer Service V3</div>
+      </button>
+      <button class="ch-btn uat" id="ch-uat-ch" onclick="selectChannel('uat-ch')">
+        <div class="ch-env">UAT</div>
+        <div class="ch-name">Chang HomePro V3</div>
+      </button>
+      <button class="ch-btn prd" id="ch-prd-cs" onclick="selectChannel('prd-cs')">
+        <div class="ch-env">PRD</div>
+        <div class="ch-name">Customer Service V3</div>
+      </button>
+      <button class="ch-btn prd" id="ch-prd-ch" onclick="selectChannel('prd-ch')">
+        <div class="ch-env">PRD</div>
+        <div class="ch-name">Chang HomePro V3</div>
+      </button>
+    </div>
+    <div class="ch-selected" id="chSelected">No channel selected — or paste JWT manually in Section 3.</div>
+  </div>
+
   <!-- JWT -->
   <div class="card">
-    <div class="card-title">2 · Widget JWT <span class="badge required">Required</span></div>
+    <div class="card-title">3 · Widget JWT <span class="badge required">Required</span></div>
     <div class="form-group">
-      <label>jwt <span>— hardcoded per channel from NXLink</span></label>
+      <label>jwt <span>— auto-filled by Channel Preset, or paste manually</span></label>
       <input type="text" id="jwt" class="mono" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9…" />
     </div>
     <div class="banner" id="jwtBanner"></div>
@@ -125,7 +161,7 @@
 
   <!-- Customer Identity -->
   <div class="card">
-    <div class="card-title">3 · Customer Identity</div>
+    <div class="card-title">4 · Customer Identity</div>
 
     <div class="scenarios" id="scenarios">
       <button class="sc-btn active" onclick="fillScenario('guest')">👤 Guest (blank)</button>
@@ -159,13 +195,13 @@
 
   <!-- Config Preview -->
   <div class="card">
-    <div class="card-title">4 · Config Preview <span style="font-size:11px;font-weight:400;color:#6b7280;text-transform:none;letter-spacing:0">— updates live</span></div>
+    <div class="card-title">5 · Config Preview <span style="font-size:11px;font-weight:400;color:#6b7280;text-transform:none;letter-spacing:0">— updates live</span></div>
     <div class="config-preview" id="configPreview">Click Launch to see the resolved config</div>
   </div>
 
   <!-- Launch -->
   <div class="card">
-    <div class="card-title">5 · Launch</div>
+    <div class="card-title">6 · Launch</div>
     <div class="actions">
       <button class="btn btn-primary" id="btnLaunch" onclick="launchChat()">🚀 Launch Chat</button>
       <button class="btn btn-secondary" onclick="resetChat()">🔄 Reset Session</button>
@@ -176,7 +212,7 @@
 
   <!-- Debug Log -->
   <div class="card">
-    <div class="card-title">6 · Debug Log</div>
+    <div class="card-title">7 · Debug Log</div>
     <div class="log-wrap" id="logWrap"></div>
     <button class="btn btn-secondary" style="margin-top:10px;font-size:12px;padding:6px 14px" onclick="clearLog()">Clear log</button>
   </div>
@@ -190,6 +226,13 @@ const URLS = {
   PRD: 'https://websrv01-hp-prd.esigo.asia/NXAI_HP/nx-chat-bootstrap1.4.js'
 };
 
+const CHANNELS = {
+  'uat-cs': { env: 'UAT', label: 'UAT · Customer Service V3',  jwt: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0ZW5hbnRfaWQiOiIzNTkwIiwiYXVkIjoiVmlzaXRvciBDbGllbnQiLCJjb25maWdfaWQiOiI4NiIsIm5hbWUiOiJMaXZlIENoYXQiLCJpc3MiOiJueGFpLmNvbSIsImV4cCI6NDg0MjU3NDQxNCwiaWF0IjoxNzY2NzM0NDE0fQ.Kbi4r0bPKdNkOTui7uy_eIY_b7Kk_h2MZBM6VsYrfb0' },
+  'uat-ch': { env: 'UAT', label: 'UAT · Chang HomePro V3',     jwt: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0ZW5hbnRfaWQiOiIzNTkwIiwiYXVkIjoiVmlzaXRvciBDbGllbnQiLCJjb25maWdfaWQiOiI4OSIsIm5hbWUiOiJMaXZlIENoYXQiLCJpc3MiOiJueGFpLmNvbSIsImV4cCI6NDg0NjQ0NzYyNywiaWF0IjoxNzcwNjA3NjI3fQ.SbEm5L-HLOByaClcUFr-iX-Xw_VcRCtA7gJGUuBlFlY' },
+  'prd-cs': { env: 'PRD', label: 'PRD · Customer Service V3',  jwt: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0ZW5hbnRfaWQiOiIzODkyIiwiYXVkIjoiVmlzaXRvciBDbGllbnQiLCJjb25maWdfaWQiOiIxMDkiLCJuYW1lIjoiTGl2ZSBDaGF0IiwiaXNzIjoibnhhaS5jb20iLCJleHAiOjQ4NTUwMjQ2NzMsImlhdCI6MTc3OTE4NDY3M30.vWr-0dWyrK5KpCF1ZRQNN9e7NSznYaTEwA9PyGooJ0A' },
+  'prd-ch': { env: 'PRD', label: 'PRD · Chang HomePro V3',     jwt: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0ZW5hbnRfaWQiOiIzODkyIiwiYXVkIjoiVmlzaXRvciBDbGllbnQiLCJjb25maWdfaWQiOiIxMTAiLCJuYW1lIjoiTGl2ZSBDaGF0IiwiaXNzIjoibnhhaS5jb20iLCJleHAiOjQ4NTUwMjcxMjcsImlhdCI6MTc3OTE4NzEyN30.X57qwUfRajnNQGkT20qeLQnO8MVHfo_FLsXAxAeLXf8' },
+};
+
 const SCENARIOS = {
   guest:    { custName:'', phoneOrigin:'', soldTo:'', tier:'' },
   loggedin: { custName:'สมชาย ใจดี',    phoneOrigin:'0812345678', soldTo:'1000012345', tier:'Silver' },
@@ -200,6 +243,24 @@ const SCENARIOS = {
 // ── State ─────────────────────────────────────────────────────────────────
 let currentEnv = 'UAT';
 let bootstrapLoaded = false;
+
+// ── Channel Presets ───────────────────────────────────────────────────────
+function selectChannel(key) {
+  const ch = CHANNELS[key];
+  if (!ch) return;
+  // Switch env
+  setEnv(ch.env);
+  // Fill JWT
+  document.getElementById('jwt').value = ch.jwt;
+  // Highlight active button
+  Object.keys(CHANNELS).forEach(k => {
+    document.getElementById('ch-' + k).classList.toggle('active', k === key);
+  });
+  // Status text
+  document.getElementById('chSelected').textContent = `✅ Channel: ${ch.label} — JWT auto-filled`;
+  log(`Channel selected: ${ch.label}`, 'ok');
+  refreshPreview();
+}
 
 // ── Env ───────────────────────────────────────────────────────────────────
 function setEnv(env) {
