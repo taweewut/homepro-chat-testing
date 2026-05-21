@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-  <title>HomePro Chat – Test Page</title>
+  <title>HomePro Chat – homecard_prd</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -162,7 +162,7 @@
   </svg>
   <div class="header-text">
     <h1>HomePro x NXLink — Chat Test Page</h1>
-    <p>Bootstrap v1.4 · Mobile App-HomeCard · config_id 101</p>
+    <p>Bootstrap v1.4 · Mobile App-HomeCard · config_id 101 · <strong>PRD</strong></p>
   </div>
 </div>
 
@@ -185,7 +185,7 @@
         <li>
           <span class="fix-icon">🌐</span>
           <div>
-            <strong>Bootstrap URL → UAT server</strong> — changed from <code>websrv01-hp-<b>prd</b></code> to <code>websrv01-hp-<b>dev</b></code> for QAS/UAT testing.
+            <strong>Bootstrap URL → PRD server</strong> — using <code>websrv01-hp-<b>prd</b></code>. Validated working on both UAT (dev) and PRD servers.
           </div>
         </li>
         <li>
@@ -206,7 +206,7 @@
     <div class="card-body">
       <div class="cfg-row">
         <span class="cfg-label">Bootstrap</span>
-        <span class="cfg-value">websrv01-hp-<strong>dev</strong>.esigo.asia/NXAI_HP/nx-chat-bootstrap1.4.js <span class="badge badge-uat">UAT</span></span>
+        <span class="cfg-value">websrv01-hp-<strong>prd</strong>.esigo.asia/NXAI_HP/nx-chat-bootstrap1.4.js <span class="badge" style="background:#fde8e8;color:#b00020;">PRD</span></span>
       </div>
       <div class="cfg-row">
         <span class="cfg-label">config_id</span>
@@ -278,10 +278,10 @@
 </div>
 
 <!-- ══════════════════════════════════════════════════════
-     NXLink Bootstrap — FIXED VERSION
+     NXLink Bootstrap — FIXED VERSION (homecard_prd)
      Changes from original page source:
        1. JWT:          re-copied clean (byte 26 was 0x08, now 0x22)
-       2. Bootstrap URL: hp-prd → hp-dev (UAT)
+       2. Bootstrap URL: using PRD → websrv01-hp-prd (validated working)
        3. Mobile height: calc(100vh + 20%) → calc(100vh - 40px)
      ══════════════════════════════════════════════════════ -->
 <script src="https://websrv01-hp-prd.esigo.asia/NXAI_HP/nx-chat-bootstrap1.4.js"></script>
@@ -292,7 +292,7 @@
   }
 
   const config = {
-    // ── FIXED JWT (clean copy from NXLink portal) ──────────────────────
+    // ── FIXED JWT (clean copy from NXLink portal) · PRD bootstrap ─────
     jwt: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0ZW5hbnRfaWQiOiIzODkyIiwiYXVkIjoiVmlzaXRvciBDbGllbnQiLCJjb25maWdfaWQiOiIxMDEiLCJuYW1lIjoiTGl2ZSBDaGF0IiwiaXNzIjoibnhhaS5jb20iLCJleHAiOjQ4NTQ0MDE1MjUsImlhdCI6MTc3ODU2MTUyNX0.U4Pg2LsP9Dgl5kXMBeOZMi3wiDIJCAHWA4TlRQWBens",
 
     // ── Desktop defaults ───────────────────────────────────────────────
