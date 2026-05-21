@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>HomePro Chat – Test Page</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      background: #f4f6f9;
+      min-height: 100vh;
+    }
+
+    /* ── Header ─────────────────────────────── */
+    .header {
+      background: #0066b3;
+      color: #fff;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    .header svg { flex-shrink: 0; }
+    .header-text h1 { font-size: 18px; font-weight: 700; }
+    .header-text p  { font-size: 12px; opacity: 0.8; margin-top: 2px; }
+
+    /* ── Main content ───────────────────────── */
+    .container {
+      max-width: 700px;
+      margin: 32px auto;
+      padding: 0 16px 120px;
+    }
+
+    /* ── Status card ────────────────────────── */
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+    .card-header {
+      padding: 14px 20px;
+      font-weight: 700;
+      font-size: 14px;
+      background: #f7f9fc;
+      border-bottom: 1px solid #e8ecf0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-body { padding: 16px 20px; }
+
+    /* ── Config rows ────────────────────────── */
+    .cfg-row {
+      display: flex;
+      align-items: flex-start;
+      padding: 8px 0;
+      border-bottom: 1px solid #f0f2f5;
+      font-size: 13px;
+      gap: 12px;
+    }
+    .cfg-row:last-child { border-bottom: none; }
+    .cfg-label {
+      color: #888;
+      min-width: 140px;
+      flex-shrink: 0;
+    }
+    .cfg-value {
+      color: #222;
+      font-family: "Courier New", monospace;
+      font-size: 12px;
+      word-break: break-all;
+    }
+    .cfg-value.ok   { color: #1a7a32; font-weight: 600; font-family: inherit; font-size: 13px; }
+    .cfg-value.warn { color: #e65100; font-weight: 600; font-family: inherit; font-size: 13px; }
+
+    /* ── Badges ─────────────────────────────── */
+    .badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    .badge-uat  { background: #e6f4ea; color: #1a7a32; }
+    .badge-fixed{ background: #e3f2fd; color: #1565c0; }
+    .badge-warn { background: #fff3e0; color: #e65100; }
+
+    /* ── Fix list ───────────────────────────── */
+    .fix-list { list-style: none; }
+    .fix-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid #f0f2f5;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .fix-list li:last-child { border-bottom: none; }
+    .fix-icon { flex-shrink: 0; margin-top: 1px; }
+
+    /* ── Domain warning ─────────────────────── */
+    .domain-warn {
+      background: #fff8e1;
+      border: 1px solid #ffe082;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 13px;
+      color: #5d4037;
+      line-height: 1.6;
+    }
+    .domain-warn strong { color: #e65100; }
+
+    /* ── Instructions ───────────────────────── */
+    .step {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      padding: 10px 0;
+      border-bottom: 1px solid #f0f2f5;
+      font-size: 13px;
+    }
+    .step:last-child { border-bottom: none; }
+    .step-num {
+      background: #0066b3;
+      color: #fff;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    /* ── Footer note ────────────────────────── */
+    .footer-note {
+      text-align: center;
+      font-size: 11px;
+      color: #aaa;
+      margin-top: 24px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Header ──────────────────────────────────────── -->
+<div class="header">
+  <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+    <rect width="32" height="32" rx="8" fill="white" fill-opacity="0.2"/>
+    <path d="M8 20L16 12L24 20" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M10 18V24H22V18" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+  <div class="header-text">
+    <h1>HomePro x NXLink — Chat Test Page</h1>
+    <p>Bootstrap v1.4 · Mobile App-HomeCard · config_id 101</p>
+  </div>
+</div>
+
+<!-- ── Main ──────────────────────────────────────────── -->
+<div class="container">
+
+  <!-- Fixes applied -->
+  <div class="card">
+    <div class="card-header">
+      ✅ Fixes Applied in This Build
+    </div>
+    <div class="card-body">
+      <ul class="fix-list">
+        <li>
+          <span class="fix-icon">🔑</span>
+          <div>
+            <strong>JWT re-copied clean from NXLink portal</strong> — byte 26 was <code>0x08</code> (backspace) in the original page; now restored to correct <code>0x22</code> (<code>"</code>). Payload JSON is valid.
+          </div>
+        </li>
+        <li>
+          <span class="fix-icon">🌐</span>
+          <div>
+            <strong>Bootstrap URL → UAT server</strong> — changed from <code>websrv01-hp-<b>prd</b></code> to <code>websrv01-hp-<b>dev</b></code> for QAS/UAT testing.
+          </div>
+        </li>
+        <li>
+          <span class="fix-icon">📱</span>
+          <div>
+            <strong>Mobile popupHeight fixed</strong> — <code>calc(100vh + 20%)</code> was invalid CSS; replaced with <code>calc(100vh - 40px)</code>.
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Config summary -->
+  <div class="card">
+    <div class="card-header">
+      ⚙️ Active Configuration
+    </div>
+    <div class="card-body">
+      <div class="cfg-row">
+        <span class="cfg-label">Bootstrap</span>
+        <span class="cfg-value">websrv01-hp-<strong>dev</strong>.esigo.asia/NXAI_HP/nx-chat-bootstrap1.4.js <span class="badge badge-uat">UAT</span></span>
+      </div>
+      <div class="cfg-row">
+        <span class="cfg-label">config_id</span>
+        <span class="cfg-value ok">101 — Mobile App-HomeCard</span>
+      </div>
+      <div class="cfg-row">
+        <span class="cfg-label">tenant_id</span>
+        <span class="cfg-value">3892</span>
+      </div>
+      <div class="cfg-row">
+        <span class="cfg-label">JWT valid</span>
+        <span class="cfg-value ok">✓ Payload JSON clean · exp 2123</span>
+      </div>
+      <div class="cfg-row">
+        <span class="cfg-label">custName</span>
+        <span class="cfg-value">Jakkrit 0419000 <span class="badge badge-fixed">test value</span></span>
+      </div>
+      <div class="cfg-row">
+        <span class="cfg-label">phoneOrigin</span>
+        <span class="cfg-value warn">0 ⚠ — use a real 10-digit number for full test</span>
+      </div>
+      <div class="cfg-row">
+        <span class="cfg-label">soldTo</span>
+        <span class="cfg-value">3601007996</span>
+      </div>
+      <div class="cfg-row">
+        <span class="cfg-label">tier</span>
+        <span class="cfg-value">REGULAR</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Domain warning -->
+  <div class="domain-warn" style="margin-bottom:16px;">
+    ⚠️ <strong>GitHub Pages domain note:</strong>
+    The NXLink channel is configured for domain <code>qas-mapi-clm.homepro.co.th</code>.
+    If you host this on GitHub Pages (<code>*.github.io</code>), the domain won't match — the widget may block.
+    To fix: add your GitHub Pages domain to the <strong>Customer Website Domain</strong> field in NXLink, or test by opening this file locally (file://) or via a localhost server.
+  </div>
+
+  <!-- How to test -->
+  <div class="card">
+    <div class="card-header">
+      🧪 How to Test
+    </div>
+    <div class="card-body">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div>Open this page in a browser. The chat button should appear in the bottom-right corner within 2–3 seconds.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div>Because <code>custName</code> and <code>soldTo</code> are pre-filled, the bootstrap should <strong>skip pre-chat</strong> and open the chat widget directly (logged-in flow).</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div>To test the <strong>guest/anonymous pre-chat flow</strong>, clear <code>custName</code>, <code>phoneOrigin</code>, and <code>soldTo</code> to empty strings <code>""</code> in the script below, then reload.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div>To test <strong>mobile layout</strong>, open DevTools → toggle device toolbar (iPhone/Android) and reload.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    HomePro x NXLink · Bootstrap v1.4 · UAT Test Build · May 2026
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     NXLink Bootstrap — FIXED VERSION
+     Changes from original page source:
+       1. JWT:          re-copied clean (byte 26 was 0x08, now 0x22)
+       2. Bootstrap URL: hp-prd → hp-dev (UAT)
+       3. Mobile height: calc(100vh + 20%) → calc(100vh - 40px)
+     ══════════════════════════════════════════════════════ -->
+<script src="https://websrv01-hp-dev.esigo.asia/NXAI_HP/nx-chat-bootstrap1.4.js"></script>
+<script>
+  function isMobileDevice() {
+    return window.innerWidth <= 768 ||
+           /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+  }
+
+  const config = {
+    // ── FIXED JWT (clean copy from NXLink portal) ──────────────────────
+    jwt: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0ZW5hbnRfaWQiOiIzODkyIiwiYXVkIjoiVmlzaXRvciBDbGllbnQiLCJjb25maWdfaWQiOiIxMDEiLCJuYW1lIjoiTGl2ZSBDaGF0IiwiaXNzIjoibnhhaS5jb20iLCJleHAiOjQ4NTQ0MDE1MjUsImlhdCI6MTc3ODU2MTUyNX0.U4Pg2LsP9Dgl5kXMBeOZMi3wiDIJCAHWA4TlRQWBens",
+
+    // ── Desktop defaults ───────────────────────────────────────────────
+    popupWidth:   "342px",
+    popupHeight:  "500px",
+    popupRight:   "40px",
+    popupBottom:  "190px",
+
+    prechatThemeColor:  "#0066b3",
+    prechatTitle:       "HomePro Live Chat",
+    backgroundImage:    "https://www.nxcloud.com/img/Chat.b0a30ee8.svg",
+
+    restartSessionButtonText: "เริ่มการสนทนาใหม่",
+    endSessionBarHeight:      "96px",
+    endSessionBarBackground:  "rgba(245,245,245,0.96)",
+
+    // ── Customer identity (test values — replace as needed) ────────────
+    custName:    "Jakkrit 0419000",
+    phoneOrigin: "0",           // ⚠ replace with real 10-digit phone for full test
+    soldTo:      "3601007996",
+    tier:        "REGULAR"
+  };
+
+  // ── Mobile overrides (FIXED: was calc(100vh + 20%) — invalid CSS) ────
+  if (isMobileDevice()) {
+    config.popupWidth         = "calc(100vw - 20px)";
+    config.popupHeight        = "calc(100vh - 40px)";  // fixed
+    config.popupRight         = "10px";
+    config.popupBottom        = "40px";
+    config.endSessionBarHeight = "84px";
+  }
+
+  NXChatBootstrap(config);
+</script>
+
+</body>
+</html>
