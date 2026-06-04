@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HomePro Chat – Test Harness v2</title>
+  <title>HomePro Chat – Test Harness v2 (LEGACY – pre-proxy)</title>
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
     body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f0f4f8;min-height:100vh}
@@ -104,8 +104,8 @@
 <div class="header">
   <div class="logo">HP</div>
   <div>
-    <div class="header-title">HomePro Chat – Test Harness</div>
-    <div class="header-sub">NXLink Bootstrap v1.4 · Correct parameter passing via NXChatBootstrap(config)</div>
+    <div class="header-title">HomePro Chat – Test Harness (LEGACY)</div>
+    <div class="header-sub">LEGACY pre-proxy build · NXLink Bootstrap v1.4 · kept for fallback testing</div>
   </div>
   <div class="env-pill uat" id="envPill">UAT</div>
 </div>
@@ -210,25 +210,6 @@
     <div class="banner" id="launchBanner"></div>
   </div>
 
-  <!-- Chat Proxy (Async) -->
-  <div class="card">
-    <div class="card-title">6b · Chat Proxy — Async Sessions <span class="badge optional">UAT only</span></div>
-    <p style="font-size:12px;color:#374151;line-height:1.6;margin-bottom:10px">
-      New proxy keeps the session stable across page refreshes (re-attaches to the same
-      conversation by name + phone instead of leave/join). Opens in a <strong>new tab</strong>
-      — the proxy page blocks iframing (<code>X-Frame-Options: SAMEORIGIN</code>).
-      Uses the JWT from Section 3 and identity from Section 4.
-    </p>
-    <div class="actions">
-      <button class="btn btn-primary" id="btnProxy" onclick="launchProxy()">🔀 Open via Chat Proxy</button>
-    </div>
-    <p style="font-size:11px;color:#e65100;margin-top:10px">
-      ⚠️ Start URL carries jwt + name + phone as query params (visible in history / logs).
-      Pending NXAP confirmation before any PRD use.
-    </p>
-    <div class="banner" id="proxyBanner"></div>
-  </div>
-
   <!-- Debug Log -->
   <div class="card">
     <div class="card-title">7 · Debug Log</div>
@@ -243,15 +224,6 @@
 const URLS = {
   UAT: 'https://websrv01-hp-dev.esigo.asia/NXAI_HP/nx-chat-bootstrap1.4.js',
   PRD: 'https://websrv01-hp-prd.esigo.asia/NXAI_HP/nx-chat-bootstrap1.4.js'
-};
-
-// New async Chat Proxy (stable sessions across refresh) — UAT only for now.
-// GET /chat/start?jwt&name&phone → 302 → /chat/<session-uuid> (resumes existing
-// session for the same identity). Page sends X-Frame-Options: SAMEORIGIN, so it
-// must open as a full page / new tab — it cannot be iframed.
-const PROXY_URLS = {
-  UAT: 'https://websrv01-hp-dev.esigo.asia/NXAI_ChatProxy/chat/start',
-  PRD: null // not yet provisioned — confirm with NXAP team
 };
 
 const CHANNELS = {
@@ -484,44 +456,6 @@ async function launchChat() {
   } finally {
     btn.disabled = false;
     btn.textContent = '🚀 Launch Chat';
-  }
-}
-
-// ── Chat Proxy (async sessions) ───────────────────────────────────────────
-function launchProxy() {
-  hideBanner('proxyBanner');
-
-  const jwt   = document.getElementById('jwt').value.trim();
-  const name  = document.getElementById('custName').value.trim();
-  const phone = document.getElementById('phoneOrigin').value.trim();
-
-  if (!PROXY_URLS[currentEnv]) {
-    showBanner('proxyBanner', `⚠️ Chat Proxy is not available on ${currentEnv} yet — UAT only.`, 'error');
-    log(`Proxy launch blocked — no ${currentEnv} proxy URL`, 'err');
-    return;
-  }
-  if (!jwt) {
-    showBanner('proxyBanner', '⚠️ JWT is required. Select a channel preset or paste it in Section 3.', 'error');
-    log('Proxy launch blocked — no JWT provided', 'err');
-    return;
-  }
-  if (!name || !phone) {
-    showBanner('proxyBanner', 'ℹ️ name/phone blank — proxy will show its pre-chat form (guest flow).', 'info');
-  }
-
-  const params = new URLSearchParams({ jwt });
-  if (name)  params.set('name', name);
-  if (phone) params.set('phone', phone);
-  const url = `${PROXY_URLS[currentEnv]}?${params.toString()}`;
-
-  log(`Opening Chat Proxy (${currentEnv}) → name="${name||'(guest)'}" phone="${phone||''}"`, 'info');
-  const win = window.open(url, '_blank');
-  if (win) {
-    log('✅ Chat Proxy opened in new tab — session resumes on refresh', 'ok');
-    showBanner('proxyBanner', '✅ Proxy chat opened in a new tab. Same name + phone re-attaches to the same session.', 'success');
-  } else {
-    log('❌ Popup blocked — allow popups for this site', 'err');
-    showBanner('proxyBanner', '❌ Popup blocked. Allow popups for this site and try again.', 'error');
   }
 }
 
