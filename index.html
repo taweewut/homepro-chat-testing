@@ -225,13 +225,35 @@
       Uses the JWT from Section 3 and identity from Section 4.
     </p>
     <div class="actions">
-      <button class="btn btn-primary" id="btnProxy" onclick="launchProxy()">🔀 Open via Chat Proxy</button>
+      <button class="btn btn-primary" id="btnProxy" onclick="launchProxy('UAT','proxyBanner')">🔀 Open via Chat Proxy</button>
     </div>
     <p style="font-size:11px;color:#e65100;margin-top:10px">
       ⚠️ Start URL carries jwt + name + phone as query params (visible in history / logs).
       Pending NXAP confirmation before any PRD use.
     </p>
     <div class="banner" id="proxyBanner"></div>
+  </div>
+
+  <!-- Chat Proxy (Async) — PRODUCTION -->
+  <div class="card">
+    <div class="card-title">6b-prd · Chat Proxy — Async Sessions <span class="badge" style="background:#fde7e7;color:#b91c1c">PRD</span></div>
+    <p style="font-size:12px;color:#374151;line-height:1.6;margin-bottom:10px">
+      Production proxy (<code>websrv01-hp-prd</code>) per the
+      <em>NXAI_ChatProxy Integration Guide (PRD)</em>. Same stable-session behaviour
+      as UAT — re-attaches by name + phone across refreshes. Opens in a
+      <strong>new tab</strong>. Requires a <strong>PRD channel JWT</strong> (tenant 3892)
+      from Section 3 — pick <em>PRD · Customer Service V3</em> or <em>PRD · Chang HomePro V3</em>;
+      a UAT JWT will be blocked. Identity (incl. email) comes from Section 4.
+    </p>
+    <div class="actions">
+      <button class="btn btn-primary" id="btnProxyPrd" onclick="launchProxy('PRD','proxyBannerPrd')">🔀 Open via Chat Proxy (PRD)</button>
+    </div>
+    <p style="font-size:11px;color:#6b7280;margin-top:10px">
+      ℹ️ Start URL carries jwt + name + phone + email as query params (visible in history / logs).
+      Per the PRD guide these channel JWTs are non-secret visitor tokens, safe to ship — the only
+      true secret is the backend X-API-Key (not used here).
+    </p>
+    <div class="banner" id="proxyBannerPrd"></div>
   </div>
 
   <!-- Debug Log -->
@@ -256,8 +278,19 @@ const URLS = {
 // integration guide; this harness opens it in a new tab for simplicity.
 const PROXY_URLS = {
   UAT: 'https://websrv01-hp-dev.esigo.asia/NXAI_ChatProxy/chat/start',
-  PRD: null // not yet provisioned — confirm with NXAP team
+  PRD: 'https://websrv01-hp-prd.esigo.asia/NXAI_ChatProxy/chat/start' // per NXAI_ChatProxy_Integration_Guide_PRD.docx
 };
+
+// Visitor-JWT tenant per env — used to warn if a UAT JWT is sent to the PRD
+// proxy (or vice-versa). UAT/DEV tokens = tenant 3590, PRD tokens = tenant 3892.
+const PROXY_TENANT = { UAT: '3590', PRD: '3892' };
+
+function jwtTenant(jwt) {
+  try {
+    const payload = JSON.parse(atob(jwt.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+    return payload.tenant_id || null;
+  } catch (e) { return null; }
+}
 
 const CHANNELS = {
   'uat-cs': { env: 'UAT', label: 'UAT · Customer Service V3',  jwt: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0ZW5hbnRfaWQiOiIzNTkwIiwiYXVkIjoiVmlzaXRvciBDbGllbnQiLCJjb25maWdfaWQiOiI4NiIsIm5hbWUiOiJMaXZlIENoYXQiLCJpc3MiOiJueGFpLmNvbSIsImV4cCI6NDg0MjU3NDQxNCwiaWF0IjoxNzY2NzM0NDE0fQ.Kbi4r0bPKdNkOTui7uy_eIY_b7Kk_h2MZBM6VsYrfb0' },
@@ -496,40 +529,53 @@ async function launchChat() {
 }
 
 // ── Chat Proxy (async sessions) ───────────────────────────────────────────
-function launchProxy() {
-  hideBanner('proxyBanner');
+// env: 'UAT' | 'PRD' — each section targets a fixed proxy regardless of the
+// Section-1 env toggle. JWT + identity (incl. email) come from Sections 3 & 4.
+function launchProxy(env, bannerId) {
+  hideBanner(bannerId);
 
   const jwt   = document.getElementById('jwt').value.trim();
   const name  = document.getElementById('custName').value.trim();
   const phone = document.getElementById('phoneOrigin').value.trim();
+  const email = document.getElementById('email').value.trim();
 
-  if (!PROXY_URLS[currentEnv]) {
-    showBanner('proxyBanner', `⚠️ Chat Proxy is not available on ${currentEnv} yet — UAT only.`, 'error');
-    log(`Proxy launch blocked — no ${currentEnv} proxy URL`, 'err');
+  if (!PROXY_URLS[env]) {
+    showBanner(bannerId, `⚠️ Chat Proxy is not available on ${env} yet.`, 'error');
+    log(`Proxy launch blocked — no ${env} proxy URL`, 'err');
     return;
   }
   if (!jwt) {
-    showBanner('proxyBanner', '⚠️ JWT is required. Select a channel preset or paste it in Section 3.', 'error');
+    showBanner(bannerId, '⚠️ JWT is required. Select a channel preset or paste it in Section 3.', 'error');
     log('Proxy launch blocked — no JWT provided', 'err');
     return;
   }
+  // Guard: the Section-3 JWT must belong to the same tenant as the target proxy
+  // (UAT JWT → UAT proxy, PRD JWT → PRD proxy). Skipped if the JWT can't decode.
+  const tenant = jwtTenant(jwt);
+  if (tenant && tenant !== PROXY_TENANT[env]) {
+    showBanner(bannerId, `⚠️ JWT tenant ${tenant} doesn't match the ${env} proxy (expects ${PROXY_TENANT[env]}). Pick a ${env} channel preset in Section 3.`, 'error');
+    log(`Proxy ${env} blocked — JWT tenant mismatch (${tenant} ≠ ${PROXY_TENANT[env]})`, 'err');
+    return;
+  }
   if (!name || !phone) {
-    showBanner('proxyBanner', 'ℹ️ name/phone blank — proxy will show its pre-chat form (guest flow).', 'info');
+    showBanner(bannerId, 'ℹ️ name/phone blank — proxy will show its pre-chat form (guest flow).', 'info');
   }
 
+  // URLSearchParams percent-encodes every value (Thai names, +-prefixed phones).
   const params = new URLSearchParams({ jwt });
   if (name)  params.set('name', name);
   if (phone) params.set('phone', phone);
-  const url = `${PROXY_URLS[currentEnv]}?${params.toString()}`;
+  if (email) params.set('email', email);
+  const url = `${PROXY_URLS[env]}?${params.toString()}`;
 
-  log(`Opening Chat Proxy (${currentEnv}) → name="${name||'(guest)'}" phone="${phone||''}"`, 'info');
+  log(`Opening Chat Proxy (${env}) → name="${name||'(guest)'}" phone="${phone||''}" email="${email||''}"`, 'info');
   const win = window.open(url, '_blank');
   if (win) {
-    log('✅ Chat Proxy opened in new tab — session resumes on refresh', 'ok');
-    showBanner('proxyBanner', '✅ Proxy chat opened in a new tab. Same name + phone re-attaches to the same session.', 'success');
+    log(`✅ Chat Proxy (${env}) opened in new tab — session resumes on refresh`, 'ok');
+    showBanner(bannerId, '✅ Proxy chat opened in a new tab. Same name + phone re-attaches to the same session.', 'success');
   } else {
     log('❌ Popup blocked — allow popups for this site', 'err');
-    showBanner('proxyBanner', '❌ Popup blocked. Allow popups for this site and try again.', 'error');
+    showBanner(bannerId, '❌ Popup blocked. Allow popups for this site and try again.', 'error');
   }
 }
 
