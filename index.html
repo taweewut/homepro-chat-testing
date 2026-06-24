@@ -220,7 +220,8 @@
     <p style="font-size:12px;color:#374151;line-height:1.6;margin-bottom:10px">
       New proxy keeps the session stable across page refreshes (re-attaches to the same
       conversation by name + phone instead of leave/join). Opens in a <strong>new tab</strong>
-      — the proxy page blocks iframing (<code>X-Frame-Options: SAMEORIGIN</code>).
+      here, but per the integration guide the proxy page is now <strong>iframe-able</strong>
+      (sandboxed iframes need <code>allow-scripts allow-forms allow-same-origin allow-popups</code>).
       Uses the JWT from Section 3 and identity from Section 4.
     </p>
     <div class="actions">
@@ -251,8 +252,8 @@ const URLS = {
 
 // New async Chat Proxy (stable sessions across refresh) — UAT only for now.
 // GET /chat/start?jwt&name&phone → 302 → /chat/<session-uuid> (resumes existing
-// session for the same identity). Page sends X-Frame-Options: SAMEORIGIN, so it
-// must open as a full page / new tab — it cannot be iframed.
+// session for the same identity). The proxy page is iframe-able per the
+// integration guide; this harness opens it in a new tab for simplicity.
 const PROXY_URLS = {
   UAT: 'https://websrv01-hp-dev.esigo.asia/NXAI_ChatProxy/chat/start',
   PRD: null // not yet provisioned — confirm with NXAP team
