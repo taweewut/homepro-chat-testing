@@ -187,6 +187,10 @@
         <label>tier <span class="badge optional">optional</span> <span>membership tier</span></label>
         <input type="text" id="tier" placeholder="e.g. Gold / Silver / Platinum" />
       </div>
+      <div class="form-group">
+        <label>email <span class="badge optional">optional</span> <span>forwarded to NXAI/CRM</span></label>
+        <input type="email" id="email" placeholder="e.g. somchai@example.com" />
+      </div>
     </div>
     <p style="font-size:11px;color:#6b7280;margin-top:10px">
       💡 Leave all blank → bootstrap shows pre-chat form (guest flow). Fill name + phone → bootstrap skips pre-chat.
@@ -262,10 +266,10 @@ const CHANNELS = {
 };
 
 const SCENARIOS = {
-  guest:    { custName:'', phoneOrigin:'', soldTo:'', tier:'' },
-  loggedin: { custName:'สมชาย ใจดี',    phoneOrigin:'0812345678', soldTo:'1000012345', tier:'Silver' },
-  gold:     { custName:'นิดา รักบ้าน',   phoneOrigin:'0898765432', soldTo:'1000098765', tier:'Gold'   },
-  platinum: { custName:'วิชัย สร้างบ้าน', phoneOrigin:'0856781234', soldTo:'1000011111', tier:'Platinum'}
+  guest:    { custName:'', phoneOrigin:'', soldTo:'', tier:'', email:'' },
+  loggedin: { custName:'สมชาย ใจดี',    phoneOrigin:'0812345678', soldTo:'1000012345', tier:'Silver',   email:'somchai@example.com' },
+  gold:     { custName:'นิดา รักบ้าน',   phoneOrigin:'0898765432', soldTo:'1000098765', tier:'Gold',     email:'nida@example.com'    },
+  platinum: { custName:'วิชัย สร้างบ้าน', phoneOrigin:'0856781234', soldTo:'1000011111', tier:'Platinum', email:'wichai@example.com'  }
 };
 
 // ── State ─────────────────────────────────────────────────────────────────
@@ -312,9 +316,10 @@ function fillScenario(key) {
   document.getElementById('phoneOrigin').value = s.phoneOrigin;
   document.getElementById('soldTo').value      = s.soldTo;
   document.getElementById('tier').value        = s.tier;
+  document.getElementById('email').value       = s.email;
   document.querySelectorAll('.sc-btn').forEach(b => b.classList.remove('active'));
   event.target.classList.add('active');
-  log(`Scenario filled: ${key} — custName="${s.custName}" phone="${s.phoneOrigin}" soldTo="${s.soldTo}" tier="${s.tier}"`, 'info');
+  log(`Scenario filled: ${key} — custName="${s.custName}" phone="${s.phoneOrigin}" soldTo="${s.soldTo}" tier="${s.tier}" email="${s.email}"`, 'info');
   refreshPreview();
 }
 
@@ -339,7 +344,8 @@ function buildConfig() {
     custName:    document.getElementById('custName').value.trim(),
     phoneOrigin: document.getElementById('phoneOrigin').value.trim(),
     soldTo:      document.getElementById('soldTo').value.trim(),
-    tier:        document.getElementById('tier').value.trim()
+    tier:        document.getElementById('tier').value.trim(),
+    email:       document.getElementById('email').value.trim()
   };
 
   // Override for mobile
@@ -376,6 +382,7 @@ function refreshPreview() {
     fmt('phoneOrigin', cfg.phoneOrigin || '', !cfg.phoneOrigin),
     fmt('soldTo',      cfg.soldTo      || '', !cfg.soldTo),
     fmt('tier',        cfg.tier        || '', !cfg.tier),
+    fmt('email',       cfg.email       || '', !cfg.email),
     `});`
   ];
   document.getElementById('configPreview').innerHTML = lines.join('\n');
@@ -455,7 +462,7 @@ async function launchChat() {
   btn.textContent = '⏳ Loading…';
 
   log(`Launching with env=${currentEnv}`, 'info');
-  log(`Identity → custName="${cfg.custName||'(guest)'}" phoneOrigin="${cfg.phoneOrigin||''}" soldTo="${cfg.soldTo||''}" tier="${cfg.tier||''}"`, 'info');
+  log(`Identity → custName="${cfg.custName||'(guest)'}" phoneOrigin="${cfg.phoneOrigin||''}" soldTo="${cfg.soldTo||''}" tier="${cfg.tier||''}" email="${cfg.email||''}"`, 'info');
   log(`Popup → ${cfg.popupWidth} × ${cfg.popupHeight} bottom=${cfg.popupBottom}`, 'info');
 
   try {
@@ -550,7 +557,7 @@ function destroyChat() {
 }
 
 // ── Live preview on input change ──────────────────────────────────────────
-['jwt','custName','phoneOrigin','soldTo','tier'].forEach(id => {
+['jwt','custName','phoneOrigin','soldTo','tier','email'].forEach(id => {
   document.getElementById(id).addEventListener('input', refreshPreview);
 });
 
